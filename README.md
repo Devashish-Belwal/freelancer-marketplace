@@ -1,5 +1,7 @@
 # market-place
 
+https://chatgpt.com/c/6a902e91-dc6c-83e8-8ba3-9647dbd1fb44
+
 A minimal next app with Prisma 8 and Prisma Composer.
 
 ## Run locally
