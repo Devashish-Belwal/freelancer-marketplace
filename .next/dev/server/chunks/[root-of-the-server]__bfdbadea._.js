@@ -207,6 +207,8 @@ module.exports = mod;
 "use strict";
 
 __turbopack_context__.s([
+    "clearAuthCookie",
+    ()=>clearAuthCookie,
     "hashPassword",
     ()=>hashPassword,
     "signToken",
@@ -221,6 +223,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jose$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jose$2f$dist$2f$webapi$2f$jwt$2f$verify$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/jose/dist/webapi/jwt/verify.js [app-route] (ecmascript)");
 ;
 ;
+const AUTH_COOKIE = "auth_token";
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined");
@@ -244,6 +247,17 @@ async function verifyToken(token) {
         role: payload.role,
         email: payload.email
     };
+}
+function clearAuthCookie(response) {
+    response.cookies.set({
+        name: AUTH_COOKIE,
+        value: "",
+        httpOnly: true,
+        secure: ("TURBOPACK compile-time value", "development") === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 0
+    });
 }
 }),
 "[project]/src/lib/errors.ts [app-route] (ecmascript)", ((__turbopack_context__) => {
@@ -292,18 +306,32 @@ async function POST(request) {
         const body = await request.json();
         const result = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$schemas$2f$auth$2e$schema$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["loginSchema"].safeParse(body);
         if (!result.success) {
-            throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_REQUEST", "Invalid login data", 400);
+            throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_CREDENTIALS", "Invalid Login Body", 400);
         }
         const { email, password } = result.data;
         const user = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].orm.public.User.where({
             email
         }).first();
         if (!user) {
-            throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_CREDENTIALS", "Invalid email or password", 401);
+            const response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "INVALID_CREDENTIALS",
+                message: "Invalid email or password"
+            }, {
+                status: 401
+            });
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["clearAuthCookie"])(response);
+            return response;
         }
         const passwordValid = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["verifyPassword"])(password, user.password);
         if (!passwordValid) {
-            throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_CREDENTIALS", "Invalid email or password", 401);
+            const response = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
+                error: "INVALID_CREDENTIALS",
+                message: "Invalid email or password"
+            }, {
+                status: 401
+            });
+            (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$auth$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["clearAuthCookie"])(response);
+            return response;
         }
         const payload = {
             userId: user.id,
@@ -341,7 +369,8 @@ async function POST(request) {
                 status: error.status
             });
         }
-        console.error(error);
+        // Keep server logs active for production debugging
+        console.error("Login API Error:", error);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             error: "INTERNAL_SERVER_ERROR",
             message: "Something went wrong"

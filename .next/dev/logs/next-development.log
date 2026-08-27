@@ -1,1 +1,6 @@
-[00:00:00.997] Server  LOG     ✓ Ready in 725ms
+[00:00:11.787] Server  LOG     ✓ Ready in 7.9s
+[00:14:03.819] Server  ERROR   RangeError: Cannot parse: 2026-09-15
+[00:14:08.185] Server  ERROR   RangeError: Cannot parse: 2026-09-15
+[00:14:33.253] Server  ERROR   RangeError: Cannot parse: 2026-09-15
+[00:15:16.622] Server  ERROR   RangeError: Cannot parse: 15-09-2026
+[00:17:54.693] Server  ERROR   RangeError: Cannot parse: 2026-09-15
