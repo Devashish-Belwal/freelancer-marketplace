@@ -1,0 +1,748 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.contract",
+    "label": "Create table \"contract\"",
+    "summary": "Creates table \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"contract\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"contract\"",
+        "sql": "CREATE TABLE \"public\".\"contract\" (\n  \"amount\" int4 NOT NULL,\n  \"clientId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"freelancerId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"projectId\" text NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"contract_status_check_24c8121c\" CHECK (\"status\" IN ('active'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"contract\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.project",
+    "label": "Create table \"project\"",
+    "summary": "Creates table \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"project\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"project\"",
+        "sql": "CREATE TABLE \"public\".\"project\" (\n  \"budgetMax\" int4 NOT NULL,\n  \"budgetMin\" int4 NOT NULL,\n  \"category\" text NOT NULL,\n  \"clientId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deadline\" timestamptz NOT NULL,\n  \"description\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"status\" text DEFAULT 'open' NOT NULL,\n  \"title\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"project_status_check_d373f548\" CHECK (\"status\" IN ('open', 'in_progress'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"project\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.proposal",
+    "label": "Create table \"proposal\"",
+    "summary": "Creates table \"proposal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"proposal\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"proposal\"",
+        "sql": "CREATE TABLE \"public\".\"proposal\" (\n  \"coverLetter\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"estimatedDuration\" int4 NOT NULL,\n  \"freelancerId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"projectId\" text NOT NULL,\n  \"proposedPrice\" int4 NOT NULL,\n  \"status\" text DEFAULT 'pending' NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"proposal_status_check_4ecfb8f7\" CHECK (\"status\" IN ('pending', 'accepted', 'rejected'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"proposal\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.user",
+    "label": "Create table \"user\"",
+    "summary": "Creates table \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"user\"",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"password\" text NOT NULL,\n  \"role\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_ae5d976e\" CHECK (\"role\" IN ('client', 'freelancer'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.contract.contract_projectId_key",
+    "label": "Add unique constraint on \"contract\" (projectId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "contract_projectId_key",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"contract_projectId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_projectId_key",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"contract_projectId_key\"",
+        "sql": "ALTER TABLE \"public\".\"contract\" ADD CONSTRAINT \"contract_projectId_key\" UNIQUE (\"projectId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"contract_projectId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_projectId_key",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.proposal.proposal_projectId_freelancerId_key",
+    "label": "Add unique constraint on \"proposal\" (projectId, freelancerId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "proposal_projectId_freelancerId_key",
+        "table": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"proposal_projectId_freelancerId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_projectId_freelancerId_key",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"proposal_projectId_freelancerId_key\"",
+        "sql": "ALTER TABLE \"public\".\"proposal\" ADD CONSTRAINT \"proposal_projectId_freelancerId_key\" UNIQUE (\"projectId\", \"freelancerId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"proposal_projectId_freelancerId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_projectId_freelancerId_key",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.user.user_email_key",
+    "label": "Add unique constraint on \"user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_email_key",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.contract.contract_clientId_idx_153a9a49",
+    "label": "Create index \"contract_clientId_idx_153a9a49\" on \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "contract_clientId_idx_153a9a49",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"contract_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"contract_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"contract_clientId_idx_153a9a49\" ON \"public\".\"contract\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"contract_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.contract.contract_freelancerId_idx_c8137280",
+    "label": "Create index \"contract_freelancerId_idx_c8137280\" on \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "contract_freelancerId_idx_c8137280",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"contract_freelancerId_idx_c8137280\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract_freelancerId_idx_c8137280\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"contract_freelancerId_idx_c8137280\"",
+        "sql": "CREATE INDEX \"contract_freelancerId_idx_c8137280\" ON \"public\".\"contract\" (\"freelancerId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"contract_freelancerId_idx_c8137280\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"contract_freelancerId_idx_c8137280\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.project.project_clientId_idx_153a9a49",
+    "label": "Create index \"project_clientId_idx_153a9a49\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "project_clientId_idx_153a9a49",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"project_clientId_idx_153a9a49\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_clientId_idx_153a9a49\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"project_clientId_idx_153a9a49\"",
+        "sql": "CREATE INDEX \"project_clientId_idx_153a9a49\" ON \"public\".\"project\" (\"clientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"project_clientId_idx_153a9a49\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_clientId_idx_153a9a49\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.proposal.proposal_freelancerId_idx_c8137280",
+    "label": "Create index \"proposal_freelancerId_idx_c8137280\" on \"proposal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "proposal_freelancerId_idx_c8137280",
+        "table": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"proposal_freelancerId_idx_c8137280\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal_freelancerId_idx_c8137280\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"proposal_freelancerId_idx_c8137280\"",
+        "sql": "CREATE INDEX \"proposal_freelancerId_idx_c8137280\" ON \"public\".\"proposal\" (\"freelancerId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"proposal_freelancerId_idx_c8137280\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal_freelancerId_idx_c8137280\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.proposal.proposal_projectId_idx_a96e4d92",
+    "label": "Create index \"proposal_projectId_idx_a96e4d92\" on \"proposal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "proposal_projectId_idx_a96e4d92",
+        "table": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"proposal_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"proposal_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"proposal_projectId_idx_a96e4d92\" ON \"public\".\"proposal\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"proposal_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"proposal_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.contract.contract_projectId_fkey",
+    "label": "Add foreign key \"contract_projectId_fkey\" on \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "contract_projectId_fkey",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"contract_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_projectId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"contract_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"contract\"\nADD CONSTRAINT \"contract_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"contract_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_projectId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.contract.contract_clientId_fkey",
+    "label": "Add foreign key \"contract_clientId_fkey\" on \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "contract_clientId_fkey",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"contract_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_clientId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"contract_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"contract\"\nADD CONSTRAINT \"contract_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"contract_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_clientId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.contract.contract_freelancerId_fkey",
+    "label": "Add foreign key \"contract_freelancerId_fkey\" on \"contract\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "contract_freelancerId_fkey",
+        "table": "contract"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"contract_freelancerId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_freelancerId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"contract_freelancerId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"contract\"\nADD CONSTRAINT \"contract_freelancerId_fkey\"\nFOREIGN KEY (\"freelancerId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"contract_freelancerId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "contract_freelancerId_fkey",
+          "public",
+          "\"public\".\"contract\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project.project_clientId_fkey",
+    "label": "Add foreign key \"project_clientId_fkey\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_clientId_fkey",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_clientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_clientId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_clientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project\"\nADD CONSTRAINT \"project_clientId_fkey\"\nFOREIGN KEY (\"clientId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_clientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_clientId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.proposal.proposal_projectId_fkey",
+    "label": "Add foreign key \"proposal_projectId_fkey\" on \"proposal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "proposal_projectId_fkey",
+        "table": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"proposal_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_projectId_fkey",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"proposal_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"proposal\"\nADD CONSTRAINT \"proposal_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"proposal_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_projectId_fkey",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.proposal.proposal_freelancerId_fkey",
+    "label": "Add foreign key \"proposal_freelancerId_fkey\" on \"proposal\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "proposal_freelancerId_fkey",
+        "table": "proposal"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"proposal_freelancerId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_freelancerId_fkey",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"proposal_freelancerId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"proposal\"\nADD CONSTRAINT \"proposal_freelancerId_fkey\"\nFOREIGN KEY (\"freelancerId\")\nREFERENCES \"public\".\"user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"proposal_freelancerId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "proposal_freelancerId_fkey",
+          "public",
+          "\"public\".\"proposal\""
+        ]
+      }
+    ]
+  }
+]

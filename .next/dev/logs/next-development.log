@@ -1,2 +1,17 @@
-[00:00:13.378] Server  LOG     ✓ Ready in 8.4s
-[00:00:16.446] Server  LOG     ○ Compiling / ...
+[00:00:01.337] Server  LOG     ✓ Ready in 997ms
+[00:00:21.792] Server  LOG       Reload env: .env
+[00:00:25.957] Server  LOG       Reload env: .env
+[00:00:27.095] Server  LOG       Reload env: .env
+[00:00:29.892] Server  LOG       Reload env: .env
+[00:00:30.922] Server  LOG       Reload env: .env
+[00:00:42.984] Server  LOG       Reload env: .env
+[00:00:43.295] Server  ERROR   (node:15236) Warning: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+
+To prepare for this change:
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[00:02:21.099] Server  LOG       Reload env: .env
