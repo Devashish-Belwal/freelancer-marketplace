@@ -1,5 +1,8 @@
 import bcrypt from "bcryptjs";
 import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import { NextResponse } from "next/server";
+
+const AUTH_COOKIE = "auth_token";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -42,4 +45,16 @@ export async function verifyToken(token: string): Promise<AuthPayload> {
     role: payload.role as "client" | "freelancer",
     email: payload.email as string,
   };
+}
+
+export function clearAuthCookie(response: NextResponse) {
+  response.cookies.set({
+    name: AUTH_COOKIE,
+    value: "",
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: 0,
+  });
 }
