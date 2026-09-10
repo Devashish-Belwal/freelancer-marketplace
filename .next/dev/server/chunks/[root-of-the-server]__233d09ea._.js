@@ -299,10 +299,10 @@ var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
 ;
 ;
 ;
-async function GET(request, { params }) {
+async function GET(_request, { params }) {
     try {
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["connectDatabase"])();
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$getCurrentUser$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getCurrentUser"])();
+        const user = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$getCurrentUser$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getCurrentUser"])();
         const { projectId } = await params;
         const project = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].orm.public.Project.where({
             id: projectId
@@ -310,6 +310,10 @@ async function GET(request, { params }) {
         if (!project) {
             throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("PROJECT_NOT_FOUND", "Project not found", 404);
         }
+        // Same authorization principle as proposal view: client owns, or freelancer views open project
+        const isOwner = project.clientId === user.userId;
+        if (user.role === "client" && !isOwner) throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("FORBIDDEN", "Not your project", 403);
+        if (user.role === "freelancer" && project.status !== "open") throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("FORBIDDEN", "Project not open", 403);
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$server$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["NextResponse"].json({
             project: {
                 id: project.id,

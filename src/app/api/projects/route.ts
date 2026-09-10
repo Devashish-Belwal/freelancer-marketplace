@@ -4,6 +4,7 @@ import { connectDatabase, db } from "@/src/prisma/db";
 import { getCurrentUser } from "@/src/lib/getCurrentUser";
 import { ApiError } from "@/src/lib/errors";
 import { createProjectSchema, projectFilterSchema } from "@/src/schemas/project.schema";
+import { Temporal } from "temporal-polyfill";
 
 export async function POST(request: Request) {
   try {
@@ -85,14 +86,12 @@ export async function GET(request: Request) {
   try {
     await connectDatabase();
 
-    await getCurrentUser();
-
     const { searchParams } = new URL(request.url);
 
     const result = projectFilterSchema.safeParse({
-      category: searchParams.get("category") ?? undefined,
-      minBudget: searchParams.get("minBudget") ?? undefined,
-      maxBudget: searchParams.get("maxBudget") ?? undefined,
+      category: searchParams.get("category") || undefined,
+      minBudget: searchParams.get("minBudget") ? parseInt(searchParams.get("minBudget")!, 10) : undefined,
+      maxBudget: searchParams.get("maxBudget") ? parseInt(searchParams.get("maxBudget")!, 10) : undefined,
     });
 
     if (!result.success) {
@@ -129,8 +128,14 @@ export async function GET(request: Request) {
 
     const projects = await query
       .include("client")
-      .include("proposals")
       .all();
+
+    // Get proposal counts efficiently using count query
+    const projectIds = projects.map(p => p.id);
+    const proposalCounts = projectIds.length > 0
+      ? await db.orm.public.Proposal.where({ projectId: { in: projectIds } }).groupBy({ by: ["projectId"], count: true })
+      : [];
+    const proposalCountMap = new Map(proposalCounts.map(pc => [pc.projectId, pc.count]));
 
     const response = projects.map((project) => ({
       id: project.id,
@@ -142,7 +147,7 @@ export async function GET(request: Request) {
       deadline: project.deadline,
       status: project.status,
       clientName: project.client.name,
-      proposalCount: project.proposals.length,
+      proposalCount: proposalCountMap.get(project.id) || 0,
     }));
 
     return NextResponse.json({

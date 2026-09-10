@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
+
 
 import { db, connectDatabase } from "@/src/prisma/db";
 import { hashPassword } from "@/src/lib/auth";
@@ -43,6 +43,11 @@ export async function POST(request: Request) {
             email,
             password: hashedPassword,
             role,
+        }).catch((createError: any) => {
+            if (createError && typeof createError === "object" && ((createError.code === "P2002" || String(createError.message || "").toLowerCase().includes("unique")))) {
+                throw new ApiError("EMAIL_ALREADY_EXISTS", "A user with this email already exists", 409);
+            }
+            throw createError;
         });
 
         return NextResponse.json(

@@ -60,10 +60,12 @@ async function request<T>(
     credentials: "include",
   });      
 
-  const data = await response.json();
+  const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message ?? "Something went wrong");      
+    const error = new Error(data.message ?? "Something went wrong");
+    (error as any).code = data.error;
+    throw error;
   }      
 
   return data;

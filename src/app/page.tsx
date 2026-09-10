@@ -1,60 +1,27 @@
-export const dynamic = "force-dynamic";
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-export default async function Home() {
-
-  const { listUsers } = await import("../prisma/users");
-  const formatter = new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-  const users = await listUsers(10).catch(() => undefined);
+export default function Home() {
+  const [role, setRole] = useState("");
+  useEffect(() => {
+    fetch("/api/auth/me", { credentials: "include" })
+      .then(r => r.json()).then(d => setRole(d.user?.role || ""));
+  }, []);
 
   return (
     <main className="shell">
-      <div className="hero">
-        <p className="eyebrow">Next.js + Prisma 8</p>
-
-        <h1>Users from your database, loaded on the server.</h1>
-        <p className="lede">
-          This page reads from <code>src/app/page.tsx</code> using the Prisma 8 helper in{" "}
-          <code>src/prisma/users.ts</code>.
-        </p>
+      <h1 style={{ fontSize: "2.5rem", marginBottom: "1rem" }}>Market Place</h1>
+      <p>Connect clients with freelancers.</p>
+      <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
+        <Link href="/login">Login</Link>
+        <Link href="/register">Register</Link>
+        <Link href="/projects">Browse Projects</Link>
+        {role === "client" && <Link href="/create-project">Create Project</Link>}
+        {role && <Link href="/contracts">My Contracts</Link>}
+        {role === "freelancer" && <Link href="/proposals/mine">My Proposals</Link>}
+        {role && <button onClick={async () => { await fetch("/api/auth/logout", { method: "POST", credentials: "include" }); window.location.href = "/"; }}>Logout</button>}
       </div>
-
-      <section className="panel">
-        <div className="panelHeader">
-          <h2>Seeded users</h2>
-          <span>{users?.length ?? 0} total</span>
-        </div>
-
-        {!users ? (
-          <p className="empty">
-            Could not query users yet. Run <code>contract:emit</code> and apply your schema,
-            then refresh.
-          </p>
-        ) : users.length === 0 ? (
-          <p className="empty">No users found.</p>
-        ) : (
-          <ul className="users">
-            {users.map((user) => (
-              <li key={user.id}>
-                <div>
-                  <strong>{user.name ?? "Unnamed user"}</strong>
-                  <p>{user.username ? `@${user.username}` : user.email}</p>
-                </div>
-                {user.createdAt ? (
-                  <time dateTime={user.createdAt}>
-                    {formatter.format(new Date(user.createdAt))}
-                  </time>
-                ) : (
-                  <span className="empty">No timestamp</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
     </main>
   );
 }

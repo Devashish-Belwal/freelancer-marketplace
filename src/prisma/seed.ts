@@ -1,29 +1,18 @@
 import { connectDatabase, db } from "./db.ts";
+import { hashPassword } from "../lib/auth";
 
 const users = [
-  { email: "alice@prisma.io", username: "alice", name: "Alice" },
-  { email: "bob@prisma.io", username: "bob", name: "Bob" },
-  { email: "carol@prisma.io", username: "carol", name: "Carol" },
+  { name: "Alice", email: "alice@prisma.io", password: "password123", role: "client" as const },
+  { name: "Bob", email: "bob@prisma.io", password: "password123", role: "freelancer" as const },
 ];
 
-let pendingSeed: Promise<void> | undefined;
-
-async function runSeed(): Promise<void> {
-  await connectDatabase();
-
-  for (const user of users) {
-    await db.orm.public.User.upsert({
-      create: user,
-      update: {},
-      conflictOn: { email: user.email },
-    });
-  }
-}
-
-export function seed(): Promise<void> {
-  pendingSeed ??= runSeed().catch((error: unknown) => {
-    pendingSeed = undefined;
-    throw error;
-  });
-  return pendingSeed;
+let pending: Promise<void> | undefined;
+export function seed() {
+  pending ??= (async () => {
+    await connectDatabase();
+    for (const u of users) {
+      await db.orm.public.User.upsert({ create: { ...u, password: await hashPassword(u.password) }, update: {}, conflictOn: { email: u.email } });
+    }
+  })();
+  return pending;
 }

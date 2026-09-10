@@ -109,6 +109,10 @@ export async function POST(
       );
     }
 
+    if (error && typeof error === "object" && ((error as any).code === "P2002" || String((error as any).message || "").toLowerCase().includes("unique"))) {
+      return NextResponse.json({ error: "PROPOSAL_ALREADY_EXISTS", message: "You have already submitted a proposal for this project" }, { status: 409 });
+    }
+
     console.error(error);
 
     return NextResponse.json(

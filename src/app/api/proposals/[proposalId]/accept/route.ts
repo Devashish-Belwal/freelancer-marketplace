@@ -61,6 +61,12 @@ export async function PUT(
         const projectId = proposal.projectId;
 
         const result = await db.transaction(async (tx) => {
+            // Re-check proposal is still pending inside transaction for concurrency
+            const currentProposal = await tx.orm.public.Proposal.where({ id: proposalId }).first();
+            if (!currentProposal || currentProposal.status !== "pending") {
+                throw new ApiError("PROPOSAL_ALREADY_PROCESSED", "Proposal no longer pending", 400);
+            }
+
             const acceptedProposal =
                 await tx.orm.public.Proposal
                     .where({ id: proposalId })

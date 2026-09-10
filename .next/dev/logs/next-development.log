@@ -1,6 +1,2 @@
-[00:00:11.787] Server  LOG     ✓ Ready in 7.9s
-[00:14:03.819] Server  ERROR   RangeError: Cannot parse: 2026-09-15
-[00:14:08.185] Server  ERROR   RangeError: Cannot parse: 2026-09-15
-[00:14:33.253] Server  ERROR   RangeError: Cannot parse: 2026-09-15
-[00:15:16.622] Server  ERROR   RangeError: Cannot parse: 15-09-2026
-[00:17:54.693] Server  ERROR   RangeError: Cannot parse: 2026-09-15
+[00:00:10.123] Server  WARN    ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+[00:00:11.698] Server  LOG     ✓ Ready in 7.6s

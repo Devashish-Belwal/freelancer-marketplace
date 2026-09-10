@@ -335,10 +335,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$getCurrentUser$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/getCurrentUser.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/errors.ts [app-route] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$schemas$2f$project$2e$schema$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/schemas/project.schema.ts [app-route] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$temporal$2d$polyfill$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/temporal-polyfill/index.js [app-route] (ecmascript)");
 var __turbopack_async_dependencies__ = __turbopack_handle_async_dependencies__([
     __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__
 ]);
 [__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__] = __turbopack_async_dependencies__.then ? (await __turbopack_async_dependencies__)() : __turbopack_async_dependencies__;
+;
 ;
 ;
 ;
@@ -357,7 +359,7 @@ async function POST(request) {
             throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_REQUEST", "Invalid project data", 400);
         }
         const { title, description, category, budgetMin, budgetMax } = result.data;
-        const deadline = Temporal.Instant.from(result.data.deadline);
+        const deadline = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$temporal$2d$polyfill$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["Temporal"].Instant.from(result.data.deadline);
         const project = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$prisma$2f$db$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["db"].orm.public.Project.create({
             title,
             description,
@@ -397,9 +399,9 @@ async function GET(request) {
         await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$getCurrentUser$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["getCurrentUser"])();
         const { searchParams } = new URL(request.url);
         const result = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$schemas$2f$project$2e$schema$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["projectFilterSchema"].safeParse({
-            category: searchParams.get("category") ?? undefined,
-            minBudget: searchParams.get("minBudget") ?? undefined,
-            maxBudget: searchParams.get("maxBudget") ?? undefined
+            category: searchParams.get("category") || undefined,
+            minBudget: searchParams.get("minBudget") ? parseInt(searchParams.get("minBudget"), 10) : undefined,
+            maxBudget: searchParams.get("maxBudget") ? parseInt(searchParams.get("maxBudget"), 10) : undefined
         });
         if (!result.success) {
             throw new __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$errors$2e$ts__$5b$app$2d$route$5d$__$28$ecmascript$29$__["ApiError"]("INVALID_REQUEST", "Invalid project filters", 400);
