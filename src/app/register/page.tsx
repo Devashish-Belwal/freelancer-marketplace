@@ -8,17 +8,17 @@ export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("freelancer");
+  const [role, setRole] = useState<"client" | "freelancer">("freelancer");
   const [msg, setMsg] = useState("");
 
   async function handle(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await signup({ name, email, password, role: role as any });
+      await signup({ name, email, password, role });
       setMsg("Registered! Redirecting to login...");
       router.replace("/login");
-    } catch (err: any) {
-      setMsg(err?.message || "Failed");
+    } catch (err: unknown) {
+      setMsg((err as { message?: string })?.message || "Failed");
     }
   }
 
@@ -28,7 +28,7 @@ export default function RegisterPage() {
       <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
       <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
       <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
-      <select value={role} onChange={e => setRole(e.target.value)}><option value="client">Client</option><option value="freelancer">Freelancer</option></select>
+      <select value={role} onChange={e => setRole(e.target.value as "client" | "freelancer")}><option value="client">Client</option><option value="freelancer">Freelancer</option></select>
       <button>Register</button>
     </form>
     <p>{msg}</p>

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Project } from "@/src/lib/api";
 
 export default function DashboardPage() {
   const [items, setItems] = useState<Project[]>([]);
@@ -11,23 +12,28 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    setLoading(true);
-    fetch("/api/auth/me", { credentials: "include" })
-      .then(r => r.json())
-      .then(d => {
-        const r = d.user?.role || "";
-        if (r !== "client") {
-          router.replace("/projects");
-          setLoading(false);
-          return;
-        }
-        setRole(r);
-        return fetch("/api/projects/mine", { credentials: "include" })
-          .then(res => { if (!res.ok) throw new Error("Failed"); return res.json(); })
-          .then(data => { setItems(data.projects || []); setLoading(false); })
-          .catch(() => { setLoading(false); setError("Failed to load projects."); });
-      })
-      .catch(() => { setLoading(false); setError("Failed to load projects."); });
+    const loadDashboard = () => {
+      setLoading(true);
+      fetch("/api/auth/me", { credentials: "include" })
+        .then(r => r.json())
+        .then(d => {
+          const r = d.user?.role || "";
+          if (r !== "client") {
+            router.replace("/projects");
+            setLoading(false);
+            return;
+          }
+          setRole(r);
+          return fetch("/api/projects/mine", { credentials: "include" })
+            .then(res => { if (!res.ok) throw new Error("Failed"); return res.json(); })
+            .then(data => { setItems(data.projects || []); setLoading(false); })
+            .catch(() => { setLoading(false); setError("Failed to load projects."); });
+        })
+        .catch(() => { setLoading(false); setError("Failed to load projects."); });
+    }
+
+    loadDashboard()
+
   }, [router]);
 
   return (

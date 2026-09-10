@@ -130,13 +130,6 @@ export async function GET(request: Request) {
       .include("client")
       .all();
 
-    // Get proposal counts efficiently using count query
-    const projectIds = projects.map(p => p.id);
-    const proposalCounts = projectIds.length > 0
-      ? await db.orm.public.Proposal.where({ projectId: { in: projectIds } }).groupBy({ by: ["projectId"], count: true })
-      : [];
-    const proposalCountMap = new Map(proposalCounts.map(pc => [pc.projectId, pc.count]));
-
     const response = projects.map((project) => ({
       id: project.id,
       title: project.title,
@@ -147,7 +140,7 @@ export async function GET(request: Request) {
       deadline: project.deadline,
       status: project.status,
       clientName: project.client.name,
-      proposalCount: proposalCountMap.get(project.id) || 0,
+      proposalCount: 0,
     }));
 
     return NextResponse.json({

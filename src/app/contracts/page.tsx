@@ -1,9 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getContracts } from "@/src/lib/api";
+import { Contract, getContracts } from "@/src/lib/api";
 
 export default function ContractsPage() {
-  const [items, setItems] = useState<Contract[]>()([]);
+  const [items, setItems] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

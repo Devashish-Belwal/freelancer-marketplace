@@ -25,18 +25,37 @@ export default function SubmitProposalPage() {
       });
   }, [pid, router]);
 
-  async function handle(e: React.FormEvent) {
+  async function handle(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!coverLetter.trim() || Number(price) <= 0 || Number(duration) <= 0) { setMsg("Cover letter required. Price and duration must be positive."); return; }
+
+    if (
+      !coverLetter.trim() ||
+      Number(price) <= 0 ||
+      Number(duration) <= 0
+    ) {
+      setMsg("Cover letter required. Price and duration must be positive.");
+      return;
+    }
+
     setLoading(true);
+
     try {
-      await submitProposal(pid, { coverLetter, proposedPrice: Number(price), estimatedDuration: Number(duration) });
+      await submitProposal(pid, {
+        coverLetter,
+        proposedPrice: Number(price),
+        estimatedDuration: Number(duration),
+      });
+
       setMsg("Proposal submitted successfully!");
       setCoverLetter("");
       setPrice("");
       setDuration("");
-    } catch (err: any) {
-      setMsg(err?.message || "Failed to submit proposal.");
+    } catch (err: unknown) {
+      setMsg(
+        err instanceof Error
+          ? err.message
+          : "Failed to submit proposal."
+      );
     } finally {
       setLoading(false);
     }

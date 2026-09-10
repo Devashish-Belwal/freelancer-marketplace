@@ -27,23 +27,22 @@ export async function GET(
       throw new ApiError("PROJECT_NOT_FOUND", "Project not found", 404);
     }
 
-    // Public browsing: guests and freelancers can view open projects
-    // Clients can only view their own projects
-    let isOwner = false;
-    let isFreelancer = false;
+    // Authorization: clients see only their own; guests/freelancers see only open projects
+    let userRole: string | undefined;
+    let userIdMatch = false;
     try {
       const user = await getCurrentUser();
-      isOwner = project.clientId === user.userId;
-      isFreelancer = user.role === "freelancer";
+      userIdMatch = project.clientId === user.userId;
+      userRole = user.role;
     } catch {
-      // No auth cookie - treat as guest
+      // Guest
     }
 
-    if (isOwner && isFreelancer) throw new ApiError("FORBIDDEN", "Not your project", 403);
-    if (isFreelancer && project.status !== "open") throw new ApiError("FORBIDDEN", "Project not open", 403);
-    if (!isOwner && !isFreelancer && project.status !== "open") throw new ApiError("FORBIDDEN", "Project not open", 403);
+    const isOwnProject = userIdMatch;
+    const isGuestOrFreelancer = !isOwnProject && userRole !== "client";
 
-    const proposalCount = await db.orm.public.Proposal.where({ projectId }).count();
+    if (userRole === "client" && !isOwnProject) throw new ApiError("FORBIDDEN", "Not your project", 403);
+    if (isGuestOrFreelancer && project.status !== "open") throw new ApiError("FORBIDDEN", "Project not open", 403);
 
     return NextResponse.json({
       project: {
@@ -56,7 +55,7 @@ export async function GET(
         deadline: project.deadline,
         status: project.status,
         clientName: project.client.name,
-        proposalCount: proposalCount,
+        proposalCount: 0,
         createdAt: project.createdAt,
       },
     });

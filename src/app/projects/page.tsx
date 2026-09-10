@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getProjects, getCurrentUser } from "@/src/lib/api";
+import { getProjects, getCurrentUser, Project } from "@/src/lib/api";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -13,19 +13,57 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    getCurrentUser().then(u => { if (!cancelled) setRole(u.user?.role || ""); }).catch(() => { if (!cancelled) setRole(""); });
-    getProjects({
-      category: filters.category || undefined,
-      minBudget: filters.minBudget ? Number(filters.minBudget) : undefined,
-      maxBudget: filters.maxBudget ? Number(filters.maxBudget) : undefined,
-    }).then(p => { if (!cancelled) { setProjects(p.projects || []); setLoading(false); } }).catch((e: unknown) => { if (!cancelled) { setErr((e instanceof Error ? e.message : "Failed to load")); setLoading(false); setProjects([]); } });
-    return () => { cancelled = true; };
+
+    async function loadProjects() {
+
+      setLoading(true);
+
+      getCurrentUser()
+        .then(u => {
+          if (!cancelled) {
+            setRole(u.user?.role || "");
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setRole("");
+          }
+        });
+
+      getProjects({
+        category: filters.category || undefined,
+        minBudget: filters.minBudget ? Number(filters.minBudget) : undefined,
+        maxBudget: filters.maxBudget ? Number(filters.maxBudget) : undefined,
+      })
+        .then(p => {
+          if (!cancelled) {
+            setProjects(p.projects || []);
+          }
+        })
+        .catch((e: unknown) => {
+          if (!cancelled) {
+            setErr(e instanceof Error ? e.message : "Failed to load");
+            setProjects([]);
+          }
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setLoading(false);
+          }
+        });
+    };
+
+    loadProjects()
+
+    return () => {
+      cancelled = true;
+    }
   }, [filters.category, filters.minBudget, filters.maxBudget]);
 
   return (
     <main className="shell">
       <h1>Browse Projects</h1>
+      {role === "freelancer" && <Link href="/proposals/mine" style={{ marginBottom: "1rem", display: "inline-block" }}>My Proposals</Link>}
       <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
         <input placeholder="Category" value={filters.category} onChange={e => setFilters({ ...filters, category: e.target.value })} />
         <input placeholder="Min budget" value={filters.minBudget} onChange={e => setFilters({ ...filters, minBudget: e.target.value })} />
@@ -40,8 +78,8 @@ export default function ProjectsPage() {
               <p style={{ fontSize: "0.8rem" }}>{p.description}</p>
               <p style={{ fontSize: "0.75rem", color: "#888" }}>Client: {p.clientName} · Proposals: {p.proposalCount}</p>
               <Link href={`/projects/${p.id}`}>View Project</Link>
+              <span> </span>
               {role === "freelancer" && <Link href={`/projects/${p.id}/proposal`}>Submit Proposal</Link>}
-              {role === "freelancer" && <Link href="/proposals/mine" style={{ marginLeft: "0.5rem" }}>My Proposals</Link>}
             </div>
           ))}
         </div>

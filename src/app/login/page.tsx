@@ -16,8 +16,8 @@ export default function LoginPage() {
       setMsg("Logged in!");
       if (u.user?.role === "client") router.replace("/dashboard");
       else router.replace("/projects");
-    } catch (err: any) {
-      setMsg(err?.message || "Login failed");
+    } catch (err: unknown) {
+      setMsg((err as { message?: string })?.message || "Login failed");
     }
   }
 

@@ -64,7 +64,7 @@ async function request<T>(
 
   if (!response.ok) {
     const error = new Error(data.message ?? "Something went wrong");
-    (error as any).code = data.error;
+    (error as Error & { code?: string }).code = data.error;
     throw error;
   }      
 

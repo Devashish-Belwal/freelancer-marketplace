@@ -16,16 +16,27 @@ export async function GET() {
       );
     }
 
-    const projects = await db.orm.public.Project.where({ clientId: user.userId }).include("client").all();
+    const projects = await db.orm.public.Project
+      .where({ clientId: user.userId })
+      .include("client")
+      .all();
 
-    const projectIds = projects.map(p => p.id);
-    const counts = projectIds.length > 0
-      ? await db.orm.public.Proposal.where({ projectId: { in: projectIds } }).groupBy({ by: ["projectId"], count: true })
-      : [];
-    const countMap = new Map(counts.map(c => [c.projectId, c.count]));
-
-    return NextResponse.json({ projects: projects.map(p => ({ id: p.id, title: p.title, description: p.description, category: p.category, budgetMin: p.budgetMin, budgetMax: p.budgetMax, deadline: p.deadline, status: p.status, proposalCount: countMap.get(p.id) || 0, clientName: p.client?.name })) });
+    return NextResponse.json({
+      projects: projects.map(p => ({
+        id: p.id,
+        title: p.title,
+        description: p.description,
+        category: p.category,
+        budgetMin: p.budgetMin,
+        budgetMax: p.budgetMax,
+        deadline: p.deadline,
+        status: p.status,
+        proposalCount: 0,
+        clientName: p.client?.name,
+      })),
+    });
   } catch (error) {
+    console.error("[/api/projects/mine] Error:", error);
     if (error instanceof ApiError) return NextResponse.json({ error: error.code, message: error.message }, { status: error.status });
     return NextResponse.json({ error: "INTERNAL_SERVER_ERROR", message: "Something went wrong" }, { status: 500 });
   }

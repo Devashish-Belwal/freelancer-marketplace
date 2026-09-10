@@ -3,7 +3,27 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CreateProjectPage() {
-  const [form, setForm] = useState({ title: "", description: "", category: "", budgetMin: 100, budgetMax: 500, deadline: new Date(Date.now() + 86400000 * 7).toISOString().slice(0, 16) });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    category: "",
+    budgetMin: 100,
+    budgetMax: 500,
+    deadline: "",
+  });
+
+  useEffect(() => {
+    const loadDate = () => {
+      setForm(form => ({
+        ...form,
+        deadline: new Date(Date.now() + 86400000 * 7)
+          .toISOString()
+          .slice(0, 16),
+      }));
+    }
+    loadDate()
+  }, []);
+  
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -17,7 +37,7 @@ export default function CreateProjectPage() {
           return;
         }
       });
-  }, []);
+  }, [router]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
