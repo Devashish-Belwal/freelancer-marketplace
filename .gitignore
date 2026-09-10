@@ -1,11 +1,70 @@
+# Dependencies
 node_modules/
+.pnp*/
+.pnp.*
+*.tgz
+
+# Next.js build output
+.next/
 dist/
+
+# Environment variables (keep .env.example for reference)
+.env
+.env.local
+.env.production
+.env.*.local
+!.env.example
+
+# Prisma / database
+*.db
+*.sqlite
+*.sqlite3
+prisma/*.db
+prisma/*.sqlite
+database/
+
+# Migrations (generated artifacts only — keep source migrations in git if needed)
+migrations/*.sql
+# migrations/*.db  # uncomment if generating DB backups here
+
+# AI / workspace artifacts (from .claude, .devin, .cursor, .agents)
+.claude/
+.devin/
+.cursor/
+.agents/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing / coverage
+coverage/
+.nyc_output/
+
+# TypeScript / build artifacts
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Project-specific (existing)
 .env
 /.alchemy
 /.prisma-composer
 .project-context/
-.next/
 
-project-context/
-
-.next
+# Lock files — decide per team (uncomment if you want to ignore them)
+# bun.lock
+# package-lock.json
+# pnpm-lock.yaml
