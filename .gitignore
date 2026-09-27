@@ -62,7 +62,8 @@ desktop.ini
 .env
 /.alchemy
 /.prisma-composer
-.project-context/
+
+project-context/
 
 # Lock files — decide per team (uncomment if you want to ignore them)
 # bun.lock
